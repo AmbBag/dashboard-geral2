@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Login</title>
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Firebase v8 -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+</head>
+
+<body>
+  <div class="login-container">
+    <h2>Entrar</h2>
+
+    <label>Usuário</label>
+    <input id="usuario" type="text" placeholder="Digite seu login" autocomplete="username" />
+
+    <label>Senha</label>
+    <input id="senha" type="password" placeholder="Digite sua senha" autocomplete="current-password" />
+
+    <button id="btnEntrar">Entrar</button>
+
+    <p id="msg" class="msg"></p>
+  </div>
+
+  <script>
+    // =======================
+    // FIREBASE CONFIG (RTDB)
+    // =======================
+    const firebaseConfig = {
+      databaseURL: "https://gwcontas-3251a-default-rtdb.firebaseio.com/"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    const usuarioEl = document.getElementById("usuario");
+    const senhaEl   = document.getElementById("senha");
+    const msgEl     = document.getElementById("msg");
+    const btnEntrar = document.getElementById("btnEntrar");
+
+    function setMsg(texto, tipo = "erro") {
+      msgEl.textContent = texto;
+      msgEl.className = "msg " + (tipo === "ok" ? "ok" : "erro");
+    }
+
+    async function fazerLogin() {
+      const usuario = (usuarioEl.value || "").trim();
+      const senhaDigitada = (senhaEl.value || "").trim();
+
+      if (!usuario || !senhaDigitada) {
+        setMsg("Preencha usuário e senha.");
+        return;
+      }
+
+      btnEntrar.disabled = true;
+      btnEntrar.textContent = "Entrando...";
+
+      try {
+        // Lê a senha no caminho: /usuarios/{usuario}/senha
+        const ref = firebase.database().ref(`usuarios/${usuario}/senha`);
+        const snap = await ref.once("value");
+
+        if (!snap.exists()) {
+          setMsg("Usuário não encontrado.");
+          return;
+        }
+
+        const senhaDoBanco = String(snap.val() ?? "");
+
+        if (senhaDigitada === senhaDoBanco) {
+          setMsg("Login aprovado! Redirecionando...", "ok");
+          // Se quiser guardar o usuário logado:
+          localStorage.setItem("usuarioLogado", usuario);
+
+          window.location.href = "Index2.html";
+        } else {
+          setMsg("Senha incorreta.");
+        }
+      } catch (e) {
+        console.error(e);
+        setMsg("Erro ao conectar no Firebase. Verifique regras/permissões.");
+      } finally {
+        btnEntrar.disabled = false;
+        btnEntrar.textContent = "Entrar";
+      }
+    }
+
+    btnEntrar.addEventListener("click", fazerLogin);
+    senhaEl.addEventListener("keydown", (ev) => {
+      if (ev.key === "Enter") fazerLogin();
+    });
+    usuarioEl.addEventListener("keydown", (ev) => {
+      if (ev.key === "Enter") fazerLogin();
+    });
+  </script>
+</body>
+</html>

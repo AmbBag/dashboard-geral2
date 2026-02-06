@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard da Produção - CAF</title>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+  <link rel="stylesheet" href="style2.css">
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-content">
+
+    <!-- LOGO / NOME -->
+    <div class="logo">
+      <span class="amb">Dash</span><span class="bag">board</span>
+    </div>
+
+    <!-- TÍTULO -->
+    <div class="titulo">
+      <h1>Dashboard da Produção</h1>
+      <p>Controle Operacional</p>
+    </div>
+
+    <!-- MENU DE NAVEGAÇÃO -->
+    <nav class="menu">
+      <button onclick="location.href='index2.html'">Unidade Padrão</button>
+      <button onclick="location.href='index3.html'">Unidade Especial</button>
+      <button onclick="location.href='index.html'">Sair</button>
+
+  </div>
+</header>
+
+
+<!-- CONTEÚDO -->
+<main class="container">
+
+  <div class="topo">
+    <label>Selecionar data:</label>
+    <input type="date" id="data">
+    <!-- 🔧 FUNÇÃO CORRETA -->
+    <button onclick="buscarDashboard()">Buscar</button>
+  </div>
+
+  <!-- TABELA PRINCIPAL -->
+  <table>
+    <thead>
+      <tr>
+        <th>CÉLULA</th>
+        <th>1H</th>
+        <th>2H</th>
+        <th>3H</th>
+        <th>4H</th>
+        <th>5H</th>
+        <th>6H</th>
+        <th>7H</th>
+        <th>8H</th>
+        <th>9H</th>
+        <th class="hora-extra">HORA EXTRA</th>
+        <th>Total</th>
+        <th>Tendência</th>
+        <th>% Cap.</th>
+        <th>Desvio</th>
+      </tr>
+    </thead>
+
+    <tbody id="tbody"></tbody>
+
+    <tfoot>
+      <tr id="total-geral">
+        <td><b>TOTAL</b></td>
+        <td colspan="14"></td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <!-- OPS PRODUZIDAS -->
+  <div class="card">
+    <h3>OPs Produzidas no Dia</h3>
+
+    <table id="ops">
+      <thead>
+        <tr>
+          <th>CodCliente</th>
+          <th>OP</th>
+          <th>Qtd Planejada</th>
+          <th>Total Lido Hoje</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  Dashboard desenvolvido por <b>TechCore</b> · Soluções Inteligentes em Tecnologia
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

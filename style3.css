@@ -1,0 +1,249 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #e8f5e9, #ffffff);
+}
+
+/* HEADER */
+.header {
+  background: linear-gradient(90deg, #1b5e20, #2e7d32);
+  color: white;
+  padding: 15px 30px;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.logo {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.logo .dash {
+  color: #f30505;
+}
+
+.logo .board {
+  color: #999595;
+}
+
+.titulo h1 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.titulo p {
+  margin: 0;
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+/* CONTAINER */
+.container {
+  padding: 15px 20px;
+}
+
+/* TOPO */
+.topo {
+  margin-bottom: 10px;
+}
+
+.topo label {
+  font-size: 14px;
+  margin-right: 5px;
+}
+
+.topo input,
+.topo button {
+  padding: 5px 10px;
+  font-size: 13px;
+}
+
+.topo button {
+  background: #e20909;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+.topo button:hover {
+  background: #ff1e00;
+}
+
+/* TABELA */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+th {
+  background: #2b2b2b;
+  color: white;
+  padding: 8px;
+  border: 1px solid #000;
+  font-size: 14px;
+}
+
+td {
+  text-align: center;
+  padding: 6px;
+  border: 1px solid #ddd;
+  font-size: 13px;
+}
+
+/* CORES */
+.verde {
+  background-color: #c8f7c5;
+  color: #000;
+  font-weight: bold;
+}
+
+.amarelo {
+  background-color: #fff3b0;
+  color: #000;
+  font-weight: bold;
+}
+
+.vermelho {
+  background-color: #f7c5c5;
+  color: #000;
+  font-weight: bold;
+}
+
+/* HORA EXTRA */
+.hora-extra,
+td.extra {
+  min-width: 55px;
+  width: 55px;
+  max-width: 55px;
+}
+
+/* FOOTER */
+.footer {
+  margin-top: 20px;
+  padding: 10px;
+  text-align: center;
+  font-size: 12px;
+  background: #f2f2f2;
+  color: #333;
+}
+.tabela-ops {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.tabela-ops th {
+  background: #3A3A3A;
+  color: #FFF;
+  padding: 6px;
+  text-align: left;
+}
+
+.tabela-ops td {
+  padding: 6px;
+  border-bottom: 1px solid #DDD;
+}
+
+.card {
+  background: #FFF;
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: 0 0 4px rgba(0,0,0,0.15);
+  margin-bottom: 14px;
+}
+/* ===== HEADER ===== */
+.header {
+  background: #ffffff;
+  border-bottom: 4px solid #000000;
+  padding: 12px 30px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+/* Conteúdo principal */
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Logo */
+.logo {
+  font-size: 26px;
+  font-weight: bold;
+}
+
+.logo .amb {
+  color: #6adb35;
+}
+
+.logo .bag {
+  color: #222;
+}
+
+/* Título */
+.titulo h1 {
+  margin: 0;
+  font-size: 22px;
+  color: #222;
+}
+
+.titulo p {
+  margin: 0;
+  font-size: 13px;
+  color: #666;
+}
+
+/* ===== MENU ===== */
+.menu {
+  display: flex;
+  gap: 10px;
+}
+
+.menu button {
+  background: transparent;
+  border: 2px solid #030303;
+  color: #000000;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.menu button:hover {
+  background: #d10000;
+  color: #fff;
+}
+
+/* Botão sair */
+.menu .sair {
+  border-color: #555;
+  color: #555;
+}
+
+.menu .sair:hover {
+  background: #555;
+  color: #fff;
+}
+
+/* ===== RESPONSIVO ===== */
+@media (max-width: 900px) {
+  .header-content {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+
+  .menu {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+}
