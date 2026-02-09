@@ -238,7 +238,7 @@ function buscarOpsDia() {
   const promessas = [];
 
   for (let i = 1; i <= 10; i++) {
-    const celula = `Celula${String(i).padStart(2,"0")}`;
+    const celula = `Gw${String(i).padStart(2,"0")}`;
 
     promessas.push(
       firebase.database()
@@ -314,3 +314,4 @@ document.addEventListener("DOMContentLoaded", () => {
     buscarOpsDia();
   }, 90000);
 });
+
