@@ -10,7 +10,8 @@ firebase.initializeApp(firebaseConfig);
 // METAS
 // =======================
 const META_HORA = 50;
-const META_DIA = 440;
+const META_DIA = 460;
+const META_TOTAL_DIA = 4140; // <<< ADICIONADO
 const TOTAL_HORAS_DIA = 9;
 
 const MAPA_HORAS = [7,8,9,10,11,13,14,15,16];
@@ -216,6 +217,15 @@ function buscar() {
         totalGeral += total;
         totalTendencia += tendencia;
 
+        // <<< ADICIONADO: CAPACIDADE E DESVIO DO TOTAL (META 4140) >>>
+// <<< CAPACIDADE E DESVIO BASEADO NO TOTAL GERAL >>>
+const capacidadeTotal = META_TOTAL_DIA > 0
+  ? Math.round((totalGeral / META_TOTAL_DIA) * 100)
+  : 0;
+
+const desvioTotal = totalGeral - META_TOTAL_DIA;
+
+
         // TOTAL FINAL
         totalLinha.innerHTML = `
           <td><b>TOTAL</b></td>
@@ -223,7 +233,8 @@ function buscar() {
           <td class="extra">${totalExtra}</td>
           <td>${totalGeral}</td>
           <td class="preto">${totalTendencia}</td>
-          <td></td>
+          <td class="${capacidadeTotal >= 100 ? "verde" : "vermelho"}">${capacidadeTotal}%</td>
+          <td class="${desvioTotal >= 0 ? "verde" : "vermelho"}">${desvioTotal}</td>
         `;
       });
   }
