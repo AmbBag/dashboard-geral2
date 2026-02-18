@@ -10,8 +10,8 @@ firebase.initializeApp(firebaseConfig);
 // METAS
 // =======================
 const META_HORA = 50;
-const META_DIA = 460;
-const META_TOTAL_DIA = 4140; // <<< ADICIONADO
+const META_DIA = 440;
+const META_TOTAL_DIA = 3960; // <<< ADICIONADO
 const TOTAL_HORAS_DIA = 9;
 
 const MAPA_HORAS = [7,8,9,10,11,13,14,15,16];
