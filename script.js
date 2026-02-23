@@ -11,7 +11,7 @@ firebase.initializeApp(firebaseConfig);
 // =======================
 const META_HORA = 50;
 const META_DIA = 440;
-const META_TOTAL_DIA = 3960; // <<< ADICIONADO
+const META_TOTAL_DIA = 4400; // <<< ADICIONADO
 const TOTAL_HORAS_DIA = 9;
 
 const MAPA_HORAS = [7,8,9,10,11,13,14,15,16];
@@ -220,10 +220,10 @@ function buscar() {
         // <<< ADICIONADO: CAPACIDADE E DESVIO DO TOTAL (META 4140) >>>
 // <<< CAPACIDADE E DESVIO BASEADO NO TOTAL GERAL >>>
 const capacidadeTotal = META_TOTAL_DIA > 0
-  ? Math.round((totalGeral / META_TOTAL_DIA) * 100)
+  ? Math.round((totalTendencia / META_TOTAL_DIA) * 100)
   : 0;
 
-const desvioTotal = totalGeral - META_TOTAL_DIA;
+const desvioTotal = totalTendencia - META_TOTAL_DIA;
 
 
         // TOTAL FINAL
