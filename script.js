@@ -2,7 +2,7 @@
 // FIREBASE
 // =======================
 const firebaseConfig = {
-  databaseURL: "https://appqrcode-8d0d2-default-rtdb.firebaseio.com/"
+  databaseURL: "https://leiturasambbag-default-rtdb.firebaseio.com/"
 };
 firebase.initializeApp(firebaseConfig);
 
@@ -332,3 +332,4 @@ document.addEventListener("DOMContentLoaded", () => {
     buscarOpsDia();
   }, 90000);
 });
+
