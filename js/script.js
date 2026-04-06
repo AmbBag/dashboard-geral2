@@ -1,10 +1,16 @@
 // =======================
 // FIREBASE
 // =======================
-const firebaseConfig = {
-  databaseURL: "https://appqrcode-8d0d2-default-rtdb.firebaseio.com/"
-};
-firebase.initializeApp(firebaseConfig);
+const FIREBASE_DATABASE_URL_ATUAL = "https://historicodiario-ee9d3-default-rtdb.firebaseio.com/";
+const FIREBASE_DATABASE_URL_HISTORICO = "https://historico-ff4a5-default-rtdb.firebaseio.com/";
+
+const firebaseAppAtual = firebase.initializeApp({
+  databaseURL: FIREBASE_DATABASE_URL_ATUAL
+}, "appAtualScript");
+
+const firebaseAppHistorico = firebase.initializeApp({
+  databaseURL: FIREBASE_DATABASE_URL_HISTORICO
+}, "appHistoricoScript");
 
 // =======================
 // METAS
@@ -31,6 +37,17 @@ function corHora(v, m) {
 
 function hojeISO() {
   return new Date().toISOString().split("T")[0];
+}
+
+function compararDataISO(dataA, dataB) {
+  return dataA.localeCompare(dataB);
+}
+
+function obterDatabasePorData(dataISO) {
+  const comparacao = compararDataISO(dataISO, hojeISO());
+
+  if (comparacao < 0) return firebaseAppHistorico.database();
+  return firebaseAppAtual.database();
 }
 
 function formatarData(d) {
@@ -147,6 +164,7 @@ function buscar() {
 
   const hoje = hojeISO();
   const data = formatarData(dataInput);
+  const database = obterDatabasePorData(dataInput);
 
   // ZERA TOTAIS A CADA BUSCA
   let totalHoras = Array(9).fill(0);
@@ -160,7 +178,7 @@ function buscar() {
     const nome = `CAF ${String(i).padStart(2,"0")}`;
     const tr = linhas[nome];
 
-    firebase.database()
+    database
       .ref(`usuarios/${celula}/historico/${data}`)
       .once("value")
       .then(snap => {
@@ -253,6 +271,7 @@ function buscarOpsDia() {
   if (!dataInput) return;
 
   const data = formatarData(dataInput);
+  const database = obterDatabasePorData(dataInput);
   const tbodyOps = document.querySelector("#ops tbody");
   tbodyOps.innerHTML = "";
 
@@ -263,7 +282,7 @@ function buscarOpsDia() {
     const celula = `Celula${String(i).padStart(2,"0")}`;
 
     promessas.push(
-      firebase.database()
+      database
         .ref(`usuarios/${celula}/historico/${data}`)
         .once("value")
         .then(snap => {
