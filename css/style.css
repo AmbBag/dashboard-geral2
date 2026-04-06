@@ -410,16 +410,18 @@ button:disabled {
 }
 
 .dashboard-actions {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: auto auto;
   gap: 14px;
-  align-items: center;
+  justify-content: end;
+  align-items: start;
 }
 
 .view-switch {
   display: flex;
   gap: 10px;
   align-items: center;
+  width: fit-content;
 }
 
 .nav-link {
@@ -480,20 +482,43 @@ button:disabled {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: auto;
   min-height: 54px;
   padding: 0 20px;
+  margin-top: 0;
   border-radius: 18px;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(255, 255, 255, 0.06);
   color: var(--text);
   text-decoration: none;
   font-weight: 700;
+  box-shadow: none;
   transition: transform 0.25s ease, background 0.25s ease;
 }
 
 .secondary-action:hover {
   transform: translateY(-2px);
   background: rgba(255, 255, 255, 0.1);
+}
+
+.fullscreen-toggle {
+  justify-self: start;
+  min-height: 46px;
+  padding: 0 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(126, 199, 21, 0.26);
+  background: linear-gradient(135deg, rgba(162, 250, 27, 0.24), rgba(255, 255, 255, 0.94));
+  font-size: 0.92rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.dashboard-actions .date-card {
+  min-width: 190px;
+}
+
+.dashboard-actions > .secondary-action:last-child {
+  justify-self: start;
 }
 
 .dashboard-grid {
@@ -512,6 +537,16 @@ button:disabled {
   backdrop-filter: blur(18px);
 }
 
+.dashboard-grid > .panel-card:first-child {
+  border-color: rgba(126, 199, 21, 0.24);
+  box-shadow: 0 28px 60px rgba(77, 154, 111, 0.16);
+}
+
+.ops-panel {
+  border-color: rgba(126, 199, 21, 0.2);
+  box-shadow: 0 26px 58px rgba(77, 154, 111, 0.14);
+}
+
 .panel-head {
   display: flex;
   justify-content: space-between;
@@ -524,6 +559,28 @@ button:disabled {
   margin: 14px 0 0;
   font-size: 1.5rem;
   letter-spacing: -0.04em;
+}
+
+.panel-copy {
+  margin: 10px 0 0;
+  color: var(--text-soft);
+  font-size: 0.96rem;
+  line-height: 1.5;
+}
+
+.ops-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: rgba(162, 250, 27, 0.18);
+  border: 1px solid rgba(126, 199, 21, 0.24);
+  color: #557d12;
+  font-size: 0.82rem;
+  font-weight: 800;
+  white-space: nowrap;
 }
 
 .table-wrap {
@@ -539,6 +596,54 @@ button:disabled {
 
 .dashboard-table.compact {
   min-width: 330px;
+}
+
+.ops-panel {
+  cursor: pointer;
+}
+
+.ops-table-wrap {
+  overflow: hidden;
+}
+
+.ops-table {
+  min-width: 100%;
+}
+
+.ops-table tbody td {
+  padding: 12px 8px;
+  border-bottom: 1px solid rgba(71, 128, 96, 0.1);
+  font-weight: 700;
+}
+
+.ops-table tbody tr:hover {
+  background: rgba(162, 250, 27, 0.14);
+}
+
+.ops-table tbody tr.ops-placeholder td {
+  color: transparent;
+}
+
+.ops-panel.is-expanded .ops-table-wrap {
+  max-height: 68vh;
+  overflow: auto;
+  padding-right: 6px;
+}
+
+.ops-panel.is-expanded .ops-status {
+  background: rgba(36, 74, 53, 0.12);
+  border-color: rgba(36, 74, 53, 0.18);
+  color: var(--text-dark);
+}
+
+.dashboard-red .ops-status {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.2);
+  color: #b91c1c;
+}
+
+.dashboard-red .ops-table tbody tr:hover {
+  background: rgba(254, 202, 202, 0.3);
 }
 
 .dashboard-table th,
@@ -603,6 +708,11 @@ button:disabled {
   color: #7f1d1d;
 }
 
+.dashboard-red .fullscreen-toggle {
+  border-color: rgba(185, 28, 28, 0.18);
+  background: linear-gradient(135deg, rgba(254, 202, 202, 0.7), rgba(255, 255, 255, 0.95));
+}
+
 .dashboard-red .nav-link.active {
   background: linear-gradient(135deg, #ef4444, #b91c1c);
   color: #fff4f4;
@@ -620,6 +730,12 @@ button:disabled {
     rgba(255, 255, 255, 0.7);
   border-color: rgba(185, 28, 28, 0.1);
   box-shadow: 0 24px 55px rgba(220, 38, 38, 0.12);
+}
+
+.dashboard-red .dashboard-grid > .panel-card:first-child,
+.dashboard-red .ops-panel {
+  border-color: rgba(185, 28, 28, 0.16);
+  box-shadow: 0 28px 60px rgba(220, 38, 38, 0.14);
 }
 
 .dashboard-red .dashboard-table thead th {
@@ -655,6 +771,92 @@ button:disabled {
   font-weight: 800;
 }
 
+body.tv-fullscreen .dashboard-shell {
+  width: min(100vw - 12px, 1900px);
+  padding: 6px 0 8px;
+}
+
+body.tv-fullscreen .dashboard-header {
+  display: none;
+}
+
+body.tv-fullscreen .dashboard-grid {
+  gap: 8px;
+}
+
+body.tv-fullscreen .panel-card {
+  padding: 10px 10px 8px;
+  border-radius: 16px;
+}
+
+body.tv-fullscreen .panel-head {
+  margin-bottom: 6px;
+}
+
+body.tv-fullscreen .panel-head h2 {
+  margin: 0;
+  font-size: 1.02rem;
+}
+
+body.tv-fullscreen .dashboard-table {
+  font-size: 0.82rem;
+  min-width: 0;
+}
+
+body.tv-fullscreen .production-table {
+  font-size: 0.95rem;
+}
+
+body.tv-fullscreen .dashboard-table th,
+body.tv-fullscreen .dashboard-table td {
+  padding: 4px 3px;
+}
+
+body.tv-fullscreen .dashboard-table thead th {
+  font-size: 0.62rem;
+  letter-spacing: 0.02em;
+}
+
+body.tv-fullscreen .production-table thead th {
+  font-size: 0.7rem;
+}
+
+body.tv-fullscreen .ops-table tbody td:last-child,
+body.tv-fullscreen .dashboard-table tbody td:nth-child(12),
+body.tv-fullscreen .dashboard-table tbody td:nth-child(13),
+body.tv-fullscreen .dashboard-table tbody td:nth-child(14) {
+  font-size: 0.88rem;
+  font-weight: 900;
+}
+
+body.tv-fullscreen .dashboard-table tfoot td {
+  font-size: 0.84rem;
+}
+
+body.tv-fullscreen .production-table tfoot td {
+  font-size: 0.92rem;
+}
+
+body.tv-fullscreen .table-wrap,
+body.tv-fullscreen .ops-table-wrap {
+  overflow: hidden;
+}
+
+body.tv-fullscreen .ops-panel.is-expanded .ops-table-wrap {
+  max-height: 78vh;
+  overflow: auto;
+}
+
+body.tv-fullscreen .ops-table tbody td {
+  padding: 4px 5px;
+}
+
+body.tv-fullscreen .ops-status {
+  min-height: 28px;
+  padding: 0 10px;
+  font-size: 0.68rem;
+}
+
 @media (max-width: 980px) {
   .dashboard-shell {
     width: min(100% - 20px, 1380px);
@@ -668,10 +870,16 @@ button:disabled {
 
   .dashboard-actions {
     width: 100%;
+    grid-template-columns: 1fr;
   }
 
   .view-switch {
     width: 100%;
+  }
+
+  .fullscreen-toggle,
+  .dashboard-actions > .secondary-action:last-child {
+    justify-self: stretch;
   }
 
   .date-card {
@@ -692,5 +900,13 @@ button:disabled {
 
   .dashboard-header h1 {
     font-size: 2rem;
+  }
+
+  .ops-table {
+    font-size: 0.9rem;
+  }
+
+  .ops-table tbody td {
+    padding: 12px 8px;
   }
 }

@@ -59,6 +59,142 @@ function formatarNumero(valor) {
   return Number(valor || 0).toLocaleString("pt-BR");
 }
 
+function normalizarPlanejado(valor) {
+  if (valor === "-" || valor === undefined || valor === null || valor === "") return null;
+  const numero = Number(String(valor).replace(/\./g, "").replace(",", "."));
+  return Number.isFinite(numero) ? numero : null;
+}
+
+const OPS_LINHAS_POR_PAGINA = 4;
+const OPS_TROCA_MS = 4000;
+const opsEstado = {
+  dados: [],
+  paginaAtual: 0,
+  expandido: false,
+  timer: null
+};
+
+function atualizarEstadoTelaCheia() {
+  const emTelaCheia = document.fullscreenElement === document.documentElement;
+  document.body.classList.toggle("tv-fullscreen", emTelaCheia);
+
+  const botao = document.getElementById("fullscreenToggle");
+  if (botao) {
+    botao.textContent = emTelaCheia ? "Sair da tela cheia" : "Tela cheia";
+  }
+}
+
+function configurarTelaCheia() {
+  const botao = document.getElementById("fullscreenToggle");
+  if (!botao) return;
+
+  botao.addEventListener("click", async (event) => {
+    event.stopPropagation();
+
+    try {
+      if (document.fullscreenElement) await document.exitFullscreen();
+      else await document.documentElement.requestFullscreen();
+    } catch (erro) {
+      console.error("Nao foi possivel alternar tela cheia.", erro);
+    }
+  });
+
+  document.addEventListener("fullscreenchange", atualizarEstadoTelaCheia);
+  atualizarEstadoTelaCheia();
+}
+
+function atualizarStatusOps() {
+  const hint = document.querySelector("[data-ops-hint]");
+  const status = document.querySelector("[data-ops-status]");
+  const totalPaginas = Math.max(1, Math.ceil(opsEstado.dados.length / OPS_LINHAS_POR_PAGINA));
+
+  if (hint) {
+    hint.textContent = opsEstado.expandido
+      ? "Clique para voltar ao modo TV."
+      : "Clique para ver a tabela completa.";
+  }
+
+  if (status) {
+    status.textContent = opsEstado.expandido
+      ? `Tabela completa (${opsEstado.dados.length} ops)`
+      : `Pagina ${Math.min(opsEstado.paginaAtual + 1, totalPaginas)}/${totalPaginas} · 4 por vez`;
+  }
+}
+
+function renderizarOpsTabela() {
+  const tbodyOps = document.querySelector("#ops tbody");
+  if (!tbodyOps) return;
+
+  tbodyOps.innerHTML = "";
+
+  const dadosVisiveis = opsEstado.expandido
+    ? opsEstado.dados
+    : opsEstado.dados.slice(
+        opsEstado.paginaAtual * OPS_LINHAS_POR_PAGINA,
+        opsEstado.paginaAtual * OPS_LINHAS_POR_PAGINA + OPS_LINHAS_POR_PAGINA
+      );
+
+  dadosVisiveis.forEach((item) => {
+    const classePlanejado = item.planejadoNumero !== null && item.total >= item.planejadoNumero
+      ? "verde"
+      : "";
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${item.codCliente}</td>
+      <td>${item.op}</td>
+      <td class="${classePlanejado}">${item.qtdPlanejada === "-" ? "-" : formatarNumero(item.qtdPlanejada)}</td>
+      <td>${formatarNumero(item.total)}</td>
+    `;
+    tbodyOps.appendChild(tr);
+  });
+
+  if (!opsEstado.expandido) {
+    const faltantes = Math.max(0, OPS_LINHAS_POR_PAGINA - dadosVisiveis.length);
+    for (let i = 0; i < faltantes; i++) {
+      const tr = document.createElement("tr");
+      tr.className = "ops-placeholder";
+      tr.innerHTML = `
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      `;
+      tbodyOps.appendChild(tr);
+    }
+  }
+
+  atualizarStatusOps();
+}
+
+function iniciarRotacaoOps() {
+  if (opsEstado.timer) clearInterval(opsEstado.timer);
+
+  if (opsEstado.dados.length <= OPS_LINHAS_POR_PAGINA) return;
+
+  opsEstado.timer = setInterval(() => {
+    if (opsEstado.expandido) return;
+
+    const totalPaginas = Math.ceil(opsEstado.dados.length / OPS_LINHAS_POR_PAGINA);
+    opsEstado.paginaAtual = (opsEstado.paginaAtual + 1) % totalPaginas;
+    renderizarOpsTabela();
+  }, OPS_TROCA_MS);
+}
+
+function configurarPainelOps() {
+  const painelOps = document.querySelector(".ops-panel");
+  if (!painelOps || painelOps.dataset.ready === "true") return;
+
+  painelOps.dataset.ready = "true";
+  painelOps.addEventListener("click", (event) => {
+    if (event.target.closest("a, button, input, label")) return;
+
+    opsEstado.expandido = !opsEstado.expandido;
+    painelOps.classList.toggle("is-expanded", opsEstado.expandido);
+    renderizarOpsTabela();
+  });
+}
+
 // =======================
 // IDENTIFICA HORA
 // =======================
@@ -272,8 +408,6 @@ function buscarOpsDia() {
 
   const data = formatarData(dataInput);
   const database = obterDatabasePorData(dataInput);
-  const tbodyOps = document.querySelector("#ops tbody");
-  tbodyOps.innerHTML = "";
 
   const ops = {};
   const promessas = [];
@@ -313,22 +447,25 @@ function buscarOpsDia() {
       .then(r => r.json())
       .then(sheet => {
         const linhas = sheet.values || [];
+        opsEstado.dados = Object.entries(ops)
+          .map(([op, total]) => {
+            const linha = linhas.find(x => x[0] == op) || [];
+            const codCliente = linha[1] || "-";
+            const qtdPlanejada = linha[2] || "-";
+            const planejadoNumero = normalizarPlanejado(qtdPlanejada);
 
-        Object.entries(ops).forEach(([op, total]) => {
-          const linha = linhas.find(x => x[0] == op) || [];
-
-          const codCliente = linha[1] || "-";
-          const qtdPlanejada = linha[2] || "-";
-
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${codCliente}</td>
-            <td>${op}</td>
-            <td>${qtdPlanejada === "-" ? "-" : formatarNumero(qtdPlanejada)}</td>
-            <td>${formatarNumero(total)}</td>
-          `;
-          tbodyOps.appendChild(tr);
-        });
+            return {
+              op,
+              total,
+              codCliente,
+              qtdPlanejada,
+              planejadoNumero
+            };
+          })
+          .sort((a, b) => b.total - a.total || a.op.localeCompare(b.op));
+        opsEstado.paginaAtual = 0;
+        renderizarOpsTabela();
+        iniciarRotacaoOps();
       });
   });
 }
@@ -340,6 +477,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const dataInput = document.getElementById("data");
   dataInput.value = hojeISO();
 
+  configurarTelaCheia();
+  configurarPainelOps();
   criarTabela();
   buscar();
   buscarOpsDia();

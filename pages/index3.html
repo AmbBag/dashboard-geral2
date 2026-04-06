@@ -25,6 +25,7 @@
           <a class="nav-link" href="index2.html">Unidade Padrão</a>
           <a class="nav-link active" href="index3.html">Unidade Especial</a>
         </nav>
+        <button type="button" class="secondary-action fullscreen-toggle" id="fullscreenToggle">Tela cheia</button>
         <label class="date-card" for="data">
           <span>Data</span>
           <input id="data" type="date" />
@@ -43,7 +44,7 @@
         </div>
 
         <div class="table-wrap">
-          <table class="dashboard-table">
+          <table class="dashboard-table production-table">
             <thead>
               <tr>
                 <th>Célula</th>
@@ -71,16 +72,18 @@
         </div>
       </section>
 
-      <section class="panel-card">
+      <section class="panel-card ops-panel">
         <div class="panel-head">
           <div>
             <span class="eyebrow">Ops consolidadas</span>
             <h2>Volume por op</h2>
+            <p class="panel-copy" data-ops-hint>Clique para ver a tabela completa.</p>
           </div>
+          <span class="ops-status" data-ops-status>Mostrando 4 por vez</span>
         </div>
 
-        <div class="table-wrap">
-          <table class="dashboard-table compact" id="ops">
+        <div class="table-wrap ops-table-wrap">
+          <table class="dashboard-table compact ops-table" id="ops">
             <thead>
               <tr>
                 <th>Cod. Cliente</th>
