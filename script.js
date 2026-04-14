@@ -1,10 +1,19 @@
 // =======================
 // FIREBASE
 // =======================
-const firebaseConfig = {
-  databaseURL: "https://appqrcode-8d0d2-default-rtdb.firebaseio.com/"
+const firebaseConfigHoje = {
+  databaseURL: "https://historicodiario-ee9d3-default-rtdb.firebaseio.com/"
 };
-firebase.initializeApp(firebaseConfig);
+
+const firebaseConfigHistorico = {
+  databaseURL: "https://historico-ff4a5-default-rtdb.firebaseio.com/"
+};
+
+const firebaseHojeApp = firebase.initializeApp(firebaseConfigHoje);
+const firebaseHistoricoApp = firebase.initializeApp(
+  firebaseConfigHistorico,
+  "historico-index2"
+);
 
 // =======================
 // METAS
@@ -30,12 +39,61 @@ function corHora(v, m) {
 }
 
 function hojeISO() {
-  return new Date().toISOString().split("T")[0];
+  const hoje = new Date();
+  const ano = hoje.getFullYear();
+  const mes = String(hoje.getMonth() + 1).padStart(2, "0");
+  const dia = String(hoje.getDate()).padStart(2, "0");
+  return `${ano}-${mes}-${dia}`;
 }
 
 function formatarData(d) {
   const [a,m,dd] = d.split("-");
   return `${dd}-${m}-${a}`;
+}
+
+function parseDataLocal(dataStr) {
+  const [ano, mes, dia] = dataStr.split("-").map(Number);
+  return new Date(ano, mes - 1, dia);
+}
+
+function compararDataComHoje(dataInput) {
+  const dataSelecionada = parseDataLocal(dataInput);
+  const hoje = parseDataLocal(hojeISO());
+
+  if (dataSelecionada.getTime() === hoje.getTime()) return 0;
+  return dataSelecionada < hoje ? -1 : 1;
+}
+
+function getDatabaseForDateInput(dataInput) {
+  return compararDataComHoje(dataInput) === 0
+    ? firebaseHojeApp.database()
+    : firebaseHistoricoApp.database();
+}
+
+function getHistoricoPaths(celula, dataInput) {
+  const dataFormatada = formatarData(dataInput);
+
+  return [
+    `usuarios/${celula}/historico/${dataFormatada}`,
+    `usuarios/${celula}/historico/${dataInput}`,
+    `usuarios/${celula}/${dataFormatada}`,
+    `usuarios/${celula}/${dataInput}`,
+    `${celula}/historico/${dataFormatada}`,
+    `${celula}/historico/${dataInput}`,
+    `${celula}/${dataFormatada}`,
+    `${celula}/${dataInput}`
+  ];
+}
+
+async function buscarSnapshotHistorico(database, celula, dataInput) {
+  const caminhos = getHistoricoPaths(celula, dataInput);
+
+  for (const caminho of caminhos) {
+    const snap = await database.ref(caminho).once("value");
+    if (snap.exists()) return snap;
+  }
+
+  return null;
 }
 
 // =======================
@@ -142,7 +200,7 @@ function buscar() {
   if (!dataInput) return;
 
   const hoje = hojeISO();
-  const data = formatarData(dataInput);
+  const database = getDatabaseForDateInput(dataInput);
 
   // ZERA TOTAIS A CADA BUSCA
   let totalHoras = Array(9).fill(0);
@@ -156,15 +214,13 @@ function buscar() {
     const nome = `CAF ${String(i).padStart(2,"0")}`;
     const tr = linhas[nome];
 
-    firebase.database()
-      .ref(`usuarios/${celula}/historico/${data}`)
-      .once("value")
+    buscarSnapshotHistorico(database, celula, dataInput)
       .then(snap => {
 
         const horas = Array(9).fill(0);
         let extra = 0;
 
-        Object.values(snap.val() || {}).forEach(item => {
+        Object.values((snap && snap.val()) || {}).forEach(item => {
           const txt = JSON.stringify(item);
           const h = identificarHora(txt);
           if (h >= 0) horas[h]++;
@@ -248,7 +304,7 @@ function buscarOpsDia() {
   const dataInput = document.getElementById("data").value;
   if (!dataInput) return;
 
-  const data = formatarData(dataInput);
+  const database = getDatabaseForDateInput(dataInput);
   const tbodyOps = document.querySelector("#ops tbody");
   tbodyOps.innerHTML = "";
 
@@ -259,11 +315,9 @@ function buscarOpsDia() {
     const celula = `Celula${String(i).padStart(2,"0")}`;
 
     promessas.push(
-      firebase.database()
-        .ref(`usuarios/${celula}/historico/${data}`)
-        .once("value")
+      buscarSnapshotHistorico(database, celula, dataInput)
         .then(snap => {
-          const dados = snap.val() || {};
+          const dados = (snap && snap.val()) || {};
 
           Object.entries(dados).forEach(([key, value]) => {
 
@@ -308,6 +362,11 @@ function buscarOpsDia() {
         });
       });
   });
+}
+
+function buscarDashboard() {
+  buscar();
+  buscarOpsDia();
 }
 
 // =======================
